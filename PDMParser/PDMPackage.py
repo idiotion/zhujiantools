@@ -25,7 +25,7 @@ class PDMPackage(PubItem):
         super(PDMPackage, self).setdefaultelement(xmlelement)
         physicaldiag=etree.SubElement(xmlelement, "{collection}PhysicalDiagrams")
         physicaldiag.append(self.physicalDiagram.toxmlelement())
-        defaultdiag=etree.SubElement(physicaldiag, "{collection}DefaultDiagram")
+        defaultdiag=etree.SubElement(xmlelement, "{collection}DefaultDiagram")
         etree.SubElement(defaultdiag, "{object}PhysicalDiagram" ,Ref=self.physicalDiagram.id)
         if self.tablelist:
             tables=etree.SubElement(xmlelement, "{collection}Tables")

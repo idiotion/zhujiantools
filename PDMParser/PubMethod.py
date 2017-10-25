@@ -7,7 +7,7 @@ from lxml import etree
 
 #默认命名空间
 nsmapdict={'a':'attribute','o':'object','c':'collection'}
-idno=0
+idno=3
 
 class PubItem(object):
     def __init__(self , name , code , comment=None):

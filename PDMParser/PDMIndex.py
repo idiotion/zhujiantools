@@ -20,7 +20,7 @@ class PDMIndex(PubItem):
         for col in self.columnidlist:
             indexcolumnobjectid='objid{0}'.format(self.getidno())
             indexcolumn=PubItem(indexcolumnobjectid,None,None)
-            indexelement=etree.SubElement(indexcolumns,'{object}IndexColumn',Id='oi{0}'.format(self.getidno()))
+            indexelement=etree.SubElement(indexcolumns,'{object}IndexColumn',Id=self.id)
             indexcolumn.setdefaultelement(indexelement)
             columns=etree.SubElement(indexelement, "{collection}Column")
             etree.SubElement(columns,'{object}Column',Ref=col)
