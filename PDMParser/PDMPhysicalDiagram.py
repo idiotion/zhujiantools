@@ -1,30 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*- #
 
+from PubMethod import PubItem,nsmapdict
+import os
 from lxml import etree
-import time
+import PDMSymbol
 
-def package_init():
-    nsmap = {'a': 'attribute', 'c': 'collection', 'o': 'object'}
-    initstr="""
-<o:Package Id="o6">
-<a:ObjectID>1271C020-8FBB-4FBD-820A-A906B0B24E3E</a:ObjectID>
-<a:Name>Package_1</a:Name>
-<a:Code>Package_1</a:Code>
-<a:CreationDate>1508481600</a:CreationDate>
-<a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1508481794</a:ModificationDate>
-<a:Modifier>Administrator</a:Modifier>
-<c:PhysicalDiagrams>
-<o:PhysicalDiagram Id="o9">
-<a:ObjectID>79262027-C5E9-4E70-998C-4FE8D2F4810F</a:ObjectID>
-<a:Name>PhysicalDiagram_1</a:Name>
-<a:Code>PhysicalDiagram_1</a:Code>
-<a:CreationDate>1508481600</a:CreationDate>
-<a:Creator>Administrator</a:Creator>
-<a:ModificationDate>1508481601</a:ModificationDate>
-<a:Modifier>Administrator</a:Modifier>
-<a:DisplayPreferences>[DisplayPreferences]
+class PDMPhysicalDiagram(PubItem):
+    def __init__(self,name,code,comment=None):
+        super(PDMPhysicalDiagram,self).__init__(name,code,comment)
+        self.DisplayPreferences=u"""[DisplayPreferences]
 
 [DisplayPreferences\PDM]
 
@@ -397,7 +382,7 @@ Pen=1 0 128 128 192
 Shadow color=192 192 192
 Shadow=0
 
-[DisplayPreferences\Symbol\USRDEPD]
+[DisplayPreferences\Symbol\\USRDEPD]
 OBJXSTRFont=新宋体,8,N
 OBJXSTRFont color=0, 0, 0
 Line style=1
@@ -437,15 +422,40 @@ Custom shape=
 Custom text mode=0
 Pen=1 0 0 0 255
 Shadow color=192 192 192
-Shadow=0</a:DisplayPreferences>
-<a:PaperSize>(8268, 11693)</a:PaperSize>
-<a:PageMargins>((315,354), (433,354))</a:PageMargins>
-<a:PageOrientation>1</a:PageOrientation>
-<a:PaperSource>7</a:PaperSource>
-</o:PhysicalDiagram>
-</c:PhysicalDiagrams>
-<c:DefaultDiagram>
-<o:PhysicalDiagram Ref="o9"/>
-</c:DefaultDiagram>
-</o:Package>
-    """
+Shadow=0"""
+        self.PaperSize=u'(8268, 11693)'
+        self.PageMargins=u'((315,354), (433,354))'
+        self.PageOrientation=u'1'
+        self.PaperSource=u'7'
+        self.symbollist=[]
+        self.id=self.getidno()
+
+    def addsymbol(self,name,code,symboltype,childid,comment=None):
+        symbol=PDMSymbol.PDMSymbol(name,code,symboltype,childid,comment)
+        self.symbollist.append(symbol)
+
+    def toxmlelement(self):
+        if not self.symbollist:
+            return
+        xmlelement=etree.Element('{object}PhysicalDiagram',nsmap=nsmapdict,Id=self.id)
+        super(PDMPhysicalDiagram, self).setdefaultelement(xmlelement)
+        etree.SubElement(xmlelement,"{attribute}DisplayPreferences").text=self.DisplayPreferences
+        etree.SubElement(xmlelement, "{attribute}PaperSize").text = self.PaperSize
+        etree.SubElement(xmlelement, "{attribute}PageMargins").text = self.PageMargins
+        etree.SubElement(xmlelement, "{attribute}PageOrientation").text = self.PageOrientation
+        etree.SubElement(xmlelement, "{attribute}PaperSource").text = self.PaperSource
+        symbols=etree.SubElement(xmlelement, "{collection}Symbols")
+        for symbol in self.symbollist:
+            symbols.append(symbol.toxmlelement())
+        return xmlelement
+
+    def output(self):
+        ele = self.toxmlelement()
+        eletree=etree.ElementTree(ele)
+        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        eletree.write('1234.xml',encoding='utf-8',pretty_print=True)
+
+if __name__ == '__main__':
+    test = PDMPhysicalDiagram(u'测试板面',u'testdiagram')
+    test.addtablesymbol(u'测试标签',u'testsymbol',test.getidno())
+    test.output()

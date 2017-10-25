@@ -1,4 +1,4 @@
-<annotation>
+<c:annotation xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
   <folder>VOC2014_instance12</folder>
   <filename>test.jpg</filename>
   <source>
@@ -20,7 +20,8 @@
       <ymin>200</ymin>
       <xmax>300</xmax>
       <ymax>400</ymax>
+      <o:ObjectId>123412234<a:name>hahaha</a:name></o:ObjectId>
     </bndbox>
     <difficult>0</difficult>
   </object>
-</annotation>
+</c:annotation>

@@ -23,7 +23,10 @@ class PDMHandler(object):
 
     def output(self):
         model = self.pdmtree.xpath('//o:Model',namespaces=self.root.nsmap)[0]
-        packages = model.xpath('//c:Packages',namespaces=model.nsmap)[0]
+        for item in model.findall('.//o:Table',namespaces=model.nsmap):
+            print item.tag , ':' , item.get('Id')
+        for item in model.findall('.//o:Column',namespaces=model.nsmap):
+            print item.tag , ':' , item.get('Id')
         # packagelist=packages.getchildren()
         # print model.nsmap
         # for pkg in packagelist:
@@ -36,10 +39,11 @@ class PDMHandler(object):
 
 
     def writefile(self):
-        self.pdmtree.write('test.pdm',encoding='utf-8',method='xml')
+        self.pdmtree.write('test.pdm',encoding='utf-8',method='xml',)
 
 if __name__ == '__main__':
     # pdmhandler=PDMHandler('HTCRM_CRM实时开户数据模型.pdm')
     pdmhandler = PDMHandler('ModelTemplate - 副本2.pdm')
-    pdmhandler.getallpackages()
+    pdmhandler.output()
+    # pdmhandler.writefile()
     # pdmhandler.writefile()
