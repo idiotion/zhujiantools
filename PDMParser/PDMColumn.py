@@ -8,16 +8,14 @@ from lxml import etree
 class PDMColumn(PubItem):
     def __init__(self , name , code , dataType , length ,comment = None , defaultvalue = None,mandatory=False):
         """
-        :param objectId:
-        :param name:
-        :param code:
-        :param creationDate:
-        :param creator:
-        :param dataType:
-        :param length:
-        :param comment:       字段注释
-        :param defaultvalue:  默认值
-        :param mandatory: 是否可为空 , 1表示不可为空 , 0表示可为空
+        字段项
+        :param name:            字段中文名
+        :param code:            字段英文名
+        :param dataType:        字段类型
+        :param length:          字段长度
+        :param comment:         注释
+        :param defaultvalue:    默认值
+        :param mandatory:       是否不可为空 , True不可为空 , Flase 可为空
         """
         super(PDMColumn,self).__init__(name,code,comment)
         self.dataType = dataType
@@ -29,7 +27,13 @@ class PDMColumn(PubItem):
     def toxmlelement(self):
         xmlelement=etree.Element('{object}Column',nsmap=nsmapdict,Id=self.id)
         super(PDMColumn,self).setdefaultelement(xmlelement)
-        etree.SubElement(xmlelement, "{attribute}DataType").text = '{0}({1} char)'.format(self.dataType,self.length)
+        if 'CHAR' in self.dataType.upper():
+            coldatatype='{0}({1} char)'.format(self.dataType,self.length)
+        elif 'LOB' in self.dataType.upper() or 'FILE' in self.dataType.upper():
+            coldatatype=self.dataType
+        else:
+            coldatatype='{0}({1})'.format(self.dataType,self.length)
+        etree.SubElement(xmlelement, "{attribute}DataType").text = coldatatype
         etree.SubElement(xmlelement, "{attribute}Length").text = self.length
         if self.defaultvalue:
             etree.SubElement(xmlelement, "{attribute}DefaultValue").text = self.defaultvalue

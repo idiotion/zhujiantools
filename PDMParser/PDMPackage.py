@@ -15,18 +15,35 @@ class PDMPackage(PubItem):
         self.id=self.getidno()
 
     def addtable(self ,name, code,comment=None ,totalSavingCurrency=None):
+        """
+        在Package中增加实体表
+        :param name:    中文表名
+        :param code:    英文表名
+        :param comment: 表注释
+        :param totalSavingCurrency:
+        :return: 返回PDMTable对象
+        """
         table=PDMTable(name,code,comment,totalSavingCurrency)
         self.physicalDiagram.addsymbol(name,code,u'Table',table.id)
         self.tablelist.append(table)
         return table
 
     def toxmlelement(self):
+        """
+        将包转为etree.Element对象
+        :return: etree.Element对象
+        """
+        # 增加 o:Package
         xmlelement=etree.Element('{object}Package',nsmap=nsmapdict,Id=self.id)
+        # 默认字段 , id,date等
         super(PDMPackage, self).setdefaultelement(xmlelement)
+        # 增加包面板
         physicaldiag=etree.SubElement(xmlelement, "{collection}PhysicalDiagrams")
         physicaldiag.append(self.physicalDiagram.toxmlelement())
+        # 指定包默认模板
         defaultdiag=etree.SubElement(xmlelement, "{collection}DefaultDiagram")
         etree.SubElement(defaultdiag, "{object}PhysicalDiagram" ,Ref=self.physicalDiagram.id)
+        # c:Tables , 转换包中所有表
         if self.tablelist:
             tables=etree.SubElement(xmlelement, "{collection}Tables")
             for t in self.tablelist:

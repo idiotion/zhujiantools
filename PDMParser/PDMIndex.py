@@ -6,9 +6,10 @@ import os
 from lxml import etree
 
 class PDMIndex(PubItem):
-    def __init__(self,name ,code ,columnidlist=[] ,comment=None):
+    def __init__(self,name ,code ,columnidlist=[] ,comment=None , unique = False):
         super(PDMIndex,self).__init__(name,code,comment)
         self.columnidlist = columnidlist
+        self.unique = unique
         self.id=self.getidno()
 
     def toxmlelement(self):
@@ -16,6 +17,9 @@ class PDMIndex(PubItem):
             return
         xmlelement=etree.Element('{object}Index',nsmap=nsmapdict,Id=self.id)
         super(PDMIndex, self).setdefaultelement(xmlelement)
+        #是否唯一索引
+        if self.unique:
+            etree.SubElement(xmlelement,'{attribute}Unique').text = '1'
         indexcolumns=etree.SubElement(xmlelement, "{collection}IndexColumns")
         for col in self.columnidlist:
             indexcolumnobjectid='objid{0}'.format(self.getidno())

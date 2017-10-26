@@ -19,6 +19,17 @@ class PDMTable(PubItem):
         self.id=self.getidno()
 
     def addcolumn(self,name,code,dataType,length,comment=None,defaultvalue=None,mandatory=False):
+        """
+        表增加字段
+        :param name:      字段中文名
+        :param code:      字段英文名
+        :param dataType:  字段类型
+        :param length:    长度
+        :param comment:   字段注释
+        :param defaultvalue: 默认段
+        :param mandatory:  是否不可为空 , True | False
+        :return: 返回PDMColumn.PDMColumn对象
+        """
         column=PDMColumn.PDMColumn(name,code,dataType,length,comment,defaultvalue,mandatory)
         self.columnlist.append(column)
 
@@ -38,15 +49,17 @@ class PDMTable(PubItem):
         return columnid
 
     #一个表只支持一个key
-    def addindex(self,name,code,columnidlist=[] ,comment=None,primarykey=False):
-        index = PDMKey.PDMKey(name, code, columnidlist, comment) if primarykey else \
-                PDMIndex.PDMIndex(name,code,columnidlist,comment)
-
-        if self.keylist and primarykey:
-            raise Exception('[{0}]增加key出错,目前一个表只支持一个key!'.format(self.name.encode('utf-8')))
-        if primarykey:
+    def addindex(self,name,code,columnidlist=[] ,comment=None,indextype='N'):
+        if indextype not in ('N','P','U'):
+            raise Exception("非法的索引类型[{0}],只支持('N','P','U')".format(indextype.decode('utf-8')))
+        if indextype=='P':
+            if self.keylist:
+                raise Exception('[{0}]增加key出错,目前一个表只支持一个key!'.format(self.name.encode('utf-8')))
+            index = PDMKey.PDMKey(name, code, columnidlist, comment)
             self.keylist.append(index)
         else:
+            unique= True if indextype=='U' else False
+            index=PDMIndex.PDMIndex(name,code,columnidlist,comment,unique)
             self.indexlist.append(index)
 
     def toxmlelement(self):
@@ -84,6 +97,6 @@ if __name__ == '__main__':
     test.addcolumn( u'测试字段11', u'testcol111', u'varchar2', u'60',mandatory=True)
     test.addcolumn(u'测试字段22', u'testcol123', u'varchar2', u'60',mandatory=True)
     colid=test.getcolumnidbyname([u'testcol111',u'testcol123'],True)
-    test.addindex(u'测试索引', u'testkey', colid, u'测试索引,无效字段', True)
-    test.addindex(u'测试索引12', u'testindex', colid, u'测试索引,无效字段', False)
+    test.addindex(u'测试索引', u'testkey', colid, u'测试索引,无效字段',u'P')
+    test.addindex(u'测试索引12', u'testindex', colid, u'测试索引,无效字段', u'U')
     test.output()
