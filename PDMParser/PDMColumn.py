@@ -29,7 +29,8 @@ class PDMColumn(PubItem):
         super(PDMColumn,self).setdefaultelement(xmlelement)
         if 'CHAR' in self.dataType.upper():
             coldatatype='{0}({1} char)'.format(self.dataType,self.length)
-        elif 'LOB' in self.dataType.upper() or 'FILE' in self.dataType.upper():
+        elif 'LOB' in self.dataType.upper() or 'FILE' in self.dataType.upper() or \
+                        'DATE' in self.dataType.upper() or 'TIMESTAMP' in self.dataType.upper():
             coldatatype=self.dataType
         else:
             coldatatype='{0}({1})'.format(self.dataType,self.length)
